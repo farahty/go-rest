@@ -10,7 +10,7 @@ type User struct {
 	UserName string `json:"userName" gorm:"unique"`
 	Password string `json:"password" gorm:"not null"`
 	Email    string `json:"email" gorm:"unique"`
-	Mobile   string `json:"mobile" gorm:"unique"`
+	Phone    string `json:"phone" gorm:"unique"`
 }
 
 func (u *User) BeforeUpdate(tr *gorm.DB) (err error) {
