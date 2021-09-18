@@ -19,30 +19,30 @@ func login(c *fiber.Ctx) error {
 
 	if err = c.BodyParser(&loginInput); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(
-			fiber.Map{"status": "error", "message": "Error in reading request body", "data": err},
+			JSONResponse{Status: "error", Message: "Error in reading request body", Data: err},
 		)
 	}
 
 	if loginRespons, err = authService.Login(&loginInput); err != nil {
 
 		return c.Status(fiber.StatusUnauthorized).JSON(
-			fiber.Map{"status": "error", "message": "Authintication Error", "data": err.Error()},
+			JSONResponse{Status: "error", Message: "Authintication Error", Data: err.Error()},
 		)
 	}
 
 	return c.Status(fiber.StatusOK).JSON(
-		fiber.Map{"status": "ok", "message": "login success", "data": loginRespons},
+		JSONResponse{Status: "ok", Message: "login success", Data: loginRespons},
 	)
 }
 
 func logout(c *fiber.Ctx) error {
-	return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-		"message": "route still not ready.",
-	})
+	return c.Status(fiber.StatusUnauthorized).JSON(
+		JSONResponse{Status: "error", Message: "route still not ready.", Data: ""},
+	)
 }
 
 func refreshToken(c *fiber.Ctx) error {
-	return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-		"message": "route still not ready.",
-	})
+	return c.Status(fiber.StatusUnauthorized).JSON(
+		JSONResponse{Status: "error", Message: "route still not ready.", Data: ""},
+	)
 }

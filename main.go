@@ -5,6 +5,7 @@ import (
 
 	"github.com/nimerfarahty/go-rest/config"
 	"github.com/nimerfarahty/go-rest/database"
+	_ "github.com/nimerfarahty/go-rest/docs"
 )
 
 func main() {

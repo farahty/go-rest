@@ -13,22 +13,35 @@ func UsersController(g fiber.Router) {
 
 }
 
+// Index is a function to get all books data from database
+// @Summary Get all books
+// @Description Get all books
+// @Tags books
+// @Accept json
+// @Produce json
 func index(c *fiber.Ctx) error {
 
-	return c.
-		Status(fiber.StatusBadGateway).
-		JSON(fiber.Map{
-			"message": "route still not ready",
-		})
+	users, err := usersService.FindAll()
+
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(
+			JSONResponse{Status: "error", Message: "Error in retriving users list", Data: err},
+		)
+	}
+
+	return c.Status(fiber.StatusOK).JSON(
+		JSONResponse{Status: "ok", Message: "users list retrived successfully", Data: &users},
+	)
+
 }
 
 func findOne(c *fiber.Ctx) error {
 
 	return c.
 		Status(fiber.StatusBadGateway).
-		JSON(fiber.Map{
-			"message": "route still not ready",
-		})
+		JSON(
+			JSONResponse{Status: "error", Message: "route still not ready.", Data: ""},
+		)
 }
 
 func create(c *fiber.Ctx) error {
@@ -39,17 +52,17 @@ func create(c *fiber.Ctx) error {
 
 	if err = c.BodyParser(&input); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(
-			fiber.Map{"status": "error", "message": "Error in reading request body", "data": err},
+			JSONResponse{Status: "error", Message: "Error in reading request body", Data: &err},
 		)
 	}
 
 	if user, err = usersService.CreateUser(&input); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(
-			fiber.Map{"status": "error", "message": "Validation Error", "data": err},
+			JSONResponse{Status: "error", Message: "Validation Error", Data: &err},
 		)
 	}
 
 	return c.Status(fiber.StatusCreated).JSON(
-		fiber.Map{"status": "ok", "message": "User created successfully", "data": &user},
+		JSONResponse{Status: "ok", Message: "User created successfully", Data: &user},
 	)
 }

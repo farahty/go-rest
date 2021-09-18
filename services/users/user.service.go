@@ -20,3 +20,16 @@ func CreateUser(user *CreateInput) (*models.User, error) {
 
 	return model, nil
 }
+
+func FindAll() ([]*models.User, error) {
+
+	users := []*models.User{}
+
+	tx := database.Conn.Find(&users)
+
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+
+	return users, nil
+}

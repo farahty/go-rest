@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	swagger "github.com/arsmn/fiber-swagger/v2"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/etag"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -24,6 +25,7 @@ func runApp() error {
 }
 
 func setupRoutes(app *fiber.App) {
+	app.Get("/docs/*", swagger.Handler)
 	api := app.Group("/api")
 	v1 := api.Group("/v1")
 
