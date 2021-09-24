@@ -1,56 +1,33 @@
 package scalars
 
 import (
+	"errors"
 	"io"
+	"strconv"
 	"time"
 
 	"github.com/arsmn/fastgql/graphql"
+	"gorm.io/gorm"
 )
 
-type DeletedAt struct{}
+func MarshalDeletedAt(t gorm.DeletedAt) graphql.Marshaler {
+	if t.Time.IsZero() {
+		return graphql.Null
+	}
 
-func (d DeletedAt) MarshalGQL(date time.Time) graphql.Marshaler {
 	return graphql.WriterFunc(func(w io.Writer) {
-
-		w.Write([]byte(date.String()))
-
+		io.WriteString(w, strconv.Quote(t.Time.Format(time.RFC3339)))
 	})
 }
 
-func (d DeletedAt) UnmarshalGQL(value interface{}) interface{} {
-	switch value := value.(type) {
-	case time.Time:
-		buff, err := value.MarshalText()
+func UnmarshalDeletedAt(v interface{}) (gorm.DeletedAt, error) {
+	if tmpStr, ok := v.(string); ok {
+		value, err := time.Parse(time.RFC3339, tmpStr)
 		if err != nil {
-			return nil
+			return gorm.DeletedAt{}, err
 		}
 
-		return string(buff)
-	case *time.Time:
-		if value == nil {
-			return nil
-		}
-		return serializeDateTime(*value)
-	default:
-		return nil
+		return gorm.DeletedAt{Time: value, Valid: true}, nil
 	}
-}
-
-func serializeDateTime(value interface{}) interface{} {
-	switch value := value.(type) {
-	case time.Time:
-		buff, err := value.MarshalText()
-		if err != nil {
-			return nil
-		}
-
-		return string(buff)
-	case *time.Time:
-		if value == nil {
-			return nil
-		}
-		return serializeDateTime(*value)
-	default:
-		return nil
-	}
+	return gorm.DeletedAt{}, errors.New("time should be RFC3339 formatted string")
 }

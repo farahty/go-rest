@@ -1,17 +1,18 @@
 scalar Time
+scalar DeletedAt
 
 interface Base {
   id: ID!
   createdAt: Time!
   updatedAt: Time!
-  deletedAt: Time
+  deletedAt: DeletedAt
 }
 
 type User implements Base {
   id: ID!
   createdAt: Time!
   updatedAt: Time!
-  deletedAt: Time
+  deletedAt: DeletedAt
   email: String
   phone: String
   password: String

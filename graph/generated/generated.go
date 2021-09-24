@@ -14,8 +14,10 @@ import (
 	"github.com/arsmn/fastgql/graphql"
 	"github.com/arsmn/fastgql/graphql/introspection"
 	"github.com/nimerfarahty/go-rest/graph/model"
+	"github.com/nimerfarahty/go-rest/scalars"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
+	"gorm.io/gorm"
 )
 
 // region    ************************** generated!.gotpl **************************
@@ -184,19 +186,20 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 
 var sources = []*ast.Source{
 	{Name: "gql/user.gql", Input: `scalar Time
+scalar DeletedAt
 
 interface Base {
   id: ID!
   createdAt: Time!
   updatedAt: Time!
-  deletedAt: Time
+  deletedAt: DeletedAt
 }
 
 type User implements Base {
   id: ID!
   createdAt: Time!
   updatedAt: Time!
-  deletedAt: Time
+  deletedAt: DeletedAt
   email: String
   phone: String
   password: String
@@ -501,9 +504,9 @@ func (ec *executionContext) _User_deletedAt(ctx context.Context, field graphql.C
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*time.Time)
+	res := resTmp.(*gorm.DeletedAt)
 	fc.Result = res
-	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+	return ec.marshalODeletedAt2ᚖgormᚗioᚋgormᚐDeletedAt(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _User_email(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
@@ -2357,6 +2360,21 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return graphql.MarshalBoolean(*v)
 }
 
+func (ec *executionContext) unmarshalODeletedAt2ᚖgormᚗioᚋgormᚐDeletedAt(ctx context.Context, v interface{}) (*gorm.DeletedAt, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := scalars.UnmarshalDeletedAt(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalODeletedAt2ᚖgormᚗioᚋgormᚐDeletedAt(ctx context.Context, sel ast.SelectionSet, v *gorm.DeletedAt) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return scalars.MarshalDeletedAt(*v)
+}
+
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -2379,21 +2397,6 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 		return graphql.Null
 	}
 	return graphql.MarshalString(*v)
-}
-
-func (ec *executionContext) unmarshalOTime2ᚖtimeᚐTime(ctx context.Context, v interface{}) (*time.Time, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := graphql.UnmarshalTime(v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOTime2ᚖtimeᚐTime(ctx context.Context, sel ast.SelectionSet, v *time.Time) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return graphql.MarshalTime(*v)
 }
 
 func (ec *executionContext) marshalOUser2ᚕᚖgithubᚗcomᚋnimerfarahtyᚋgoᚑrestᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v []*model.User) graphql.Marshaler {

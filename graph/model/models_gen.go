@@ -4,6 +4,8 @@ package model
 
 import (
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type Base interface {
@@ -11,13 +13,13 @@ type Base interface {
 }
 
 type User struct {
-	ID        string     `json:"id"`
-	CreatedAt time.Time  `json:"createdAt"`
-	UpdatedAt time.Time  `json:"updatedAt"`
-	DeletedAt *time.Time `json:"deletedAt"`
-	Email     *string    `json:"email"`
-	Phone     *string    `json:"phone"`
-	Password  *string    `json:"password"`
+	ID        string          `json:"id"`
+	CreatedAt time.Time       `json:"createdAt"`
+	UpdatedAt time.Time       `json:"updatedAt"`
+	DeletedAt *gorm.DeletedAt `json:"deletedAt"`
+	Email     *string         `json:"email"`
+	Phone     *string         `json:"phone"`
+	Password  *string         `json:"password"`
 }
 
 func (User) IsBase() {}
