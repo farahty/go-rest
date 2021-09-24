@@ -16,6 +16,7 @@ type User implements Base {
   email: String
   phone: String
   password: String
+  active: Boolean
 }
 
 type Query {

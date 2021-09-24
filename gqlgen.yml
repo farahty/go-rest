@@ -45,6 +45,7 @@ autobind:
 models:
   DeletedAt:
     model: github.com/nimerfarahty/go-rest/scalars.DeletedAt
+    
   ID:
     model:
       - github.com/arsmn/fastgql/graphql.ID

@@ -1,3 +1,5 @@
+//go:generate go run github.com/arsmn/fastgql
+
 package graph
 
 // This file will not be regenerated automatically.
