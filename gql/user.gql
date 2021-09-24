@@ -1,0 +1,22 @@
+scalar Time
+
+interface Base {
+  id: ID!
+  createdAt: Time!
+  updatedAt: Time!
+  deletedAt: Time
+}
+
+type User implements Base {
+  id: ID!
+  createdAt: Time!
+  updatedAt: Time!
+  deletedAt: Time
+  email: String
+  phone: String
+  password: String
+}
+
+type Query {
+  allUsers: [User]
+}
