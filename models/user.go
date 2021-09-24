@@ -5,14 +5,6 @@ import (
 	"gorm.io/gorm"
 )
 
-type User struct {
-	Base
-	Password *string `json:"-"`
-	Email    *string `json:"email" gorm:"unique"`
-	Phone    *string `json:"phone" gorm:"unique"`
-	Token    *string `json:"-" gorm:"index"`
-}
-
 func (u *User) BeforeCreate(tr *gorm.DB) (err error) {
 	if u.Password != nil {
 		if *u.Password == "" {

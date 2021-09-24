@@ -26,19 +26,18 @@ func runApp() error {
 func setupRoutes(app *fiber.App) {
 
 	api := app.Group("/api")
-	v1 := api.Group("/v1")
 
-	users := v1.Group("/users")
+	users := api.Group("/users")
 	controllers.UsersController(users)
 
-	auth := v1.Group("/auth")
+	auth := api.Group("/auth")
 	controllers.Authintication(auth)
 
-	graphql := v1.Group("/graphql")
-	controllers.Graphql(graphql)
-
-	docs := v1.Group("/docs")
+	docs := api.Group("/docs")
 	controllers.Swagger(docs)
+
+	graphql := app.Group("/")
+	controllers.Graphql(graphql)
 
 }
 
@@ -48,7 +47,8 @@ func setupMeddlewares(app *fiber.App) {
 	app.Use(etag.New())
 
 	app.Use(logger.New(logger.Config{
-		Format: "[${time}] ${status} - ${method} ${path} ${locals:requestid} ${latency}\n",
+		//Format: "[${time}] ${status} - ${method} ${path} ${locals:requestid} ${latency}\n",
+		Format: "[${time}] ${status} - ${method} ${path}\n",
 	}))
 
 	app.Get("/monitor", monitor.New())

@@ -16,9 +16,19 @@ type User implements Base {
   email: String
   phone: String
   password: String
-  active: Boolean
+  token: String
+}
+
+input CreateUserInput {
+  email: String
+  phone: String
+  password: String
 }
 
 type Query {
   allUsers: [User]
+}
+
+type Mutation {
+  createUser(user: CreateUserInput!): User
 }
