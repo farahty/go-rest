@@ -46,7 +46,7 @@ func findOne(c *fiber.Ctx) error {
 
 func create(c *fiber.Ctx) error {
 
-	var input usersService.CreateInput
+	var input models.CreateUserInput
 	var user *models.User
 	var err error
 

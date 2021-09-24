@@ -1,27 +1,20 @@
-package usersService
+package models
 
 import (
 	v "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
-	"github.com/nimerfarahty/go-rest/models"
 )
 
-type CreateInput struct {
-	Password *string `json:"password"`
-	Email    *string `json:"email"`
-	Phone    *string `json:"phone"`
-}
+func (u *CreateUserInput) ToModel() *User {
 
-func (u *CreateInput) ToModel() *models.User {
-
-	return &models.User{
+	return &User{
 		Password: u.Password,
 		Email:    u.Email,
 		Phone:    u.Phone,
 	}
 }
 
-func (u CreateInput) Validate() error {
+func (u CreateUserInput) Validate() error {
 	return v.ValidateStruct(&u,
 		v.Field(
 			&u.Password,

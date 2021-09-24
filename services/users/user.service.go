@@ -5,7 +5,7 @@ import (
 	"github.com/nimerfarahty/go-rest/models"
 )
 
-func CreateUser(user *CreateInput) (*models.User, error) {
+func CreateUser(user *models.CreateUserInput) (*models.User, error) {
 
 	if err := user.Validate(); err != nil {
 		return nil, err
@@ -19,6 +19,24 @@ func CreateUser(user *CreateInput) (*models.User, error) {
 	}
 
 	return model, nil
+}
+
+func Update(input models.UpdateUserInput) (*models.User, error) {
+
+	if err := input.Validate(); err != nil {
+		return nil, err
+	}
+
+	user := &models.User{}
+
+	tx := database.Conn.First(&user, input.ID).Updates(input.ToModel())
+
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+
+	return user, nil
+
 }
 
 func FindAll() ([]*models.User, error) {

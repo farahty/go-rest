@@ -19,6 +19,13 @@ type CreateUserInput struct {
 	Password *string `json:"password"`
 }
 
+type UpdateUserInput struct {
+	ID       uuid.UUID `json:"id" gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	Email    *string   `json:"email"`
+	Phone    *string   `json:"phone"`
+	Password *string   `json:"password"`
+}
+
 type User struct {
 	ID        uuid.UUID       `json:"id" gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
 	CreatedAt time.Time       `json:"createdAt"`
