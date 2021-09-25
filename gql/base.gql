@@ -7,3 +7,12 @@ interface Base {
   updatedAt: Time!
   deletedAt: DeletedAt
 }
+
+enum Status {
+  Active
+  Deactivated
+  Blocked
+  Draft
+  Pending
+  Closed
+}

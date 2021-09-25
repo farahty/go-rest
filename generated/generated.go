@@ -75,6 +75,7 @@ type ComplexityRoot struct {
 		DeletedAt func(childComplexity int) int
 		ID        func(childComplexity int) int
 		Name      func(childComplexity int) int
+		Status    func(childComplexity int) int
 		UpdatedAt func(childComplexity int) int
 	}
 
@@ -263,6 +264,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Todo.Name(childComplexity), true
 
+	case "Todo.status":
+		if e.complexity.Todo.Status == nil {
+			break
+		}
+
+		return e.complexity.Todo.Status(childComplexity), true
+
 	case "Todo.updatedAt":
 		if e.complexity.Todo.UpdatedAt == nil {
 			break
@@ -399,6 +407,15 @@ interface Base {
   updatedAt: Time!
   deletedAt: DeletedAt
 }
+
+enum Status {
+  Active
+  Deactivated
+  Blocked
+  Draft
+  Pending
+  Closed
+}
 `, BuiltIn: false},
 	{Name: "gql/post.gql", Input: `type Post implements Base {
   id: ID!
@@ -427,14 +444,19 @@ extend type Mutation {
   createdAt: Time!
   updatedAt: Time!
   deletedAt: DeletedAt
+
   "#gorm:index"
   name: String!
+
+  "#gorm:default:false"
   completed: Boolean
+
+  status: Status!
 }
 
 input CreateTodoInput {
   name: String!
-  completed: Boolean = false
+  completed: Boolean
 }
 
 extend type Mutation {
@@ -1327,6 +1349,41 @@ func (ec *executionContext) _Todo_completed(ctx context.Context, field graphql.C
 	res := resTmp.(*bool)
 	fc.Result = res
 	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Todo_status(ctx context.Context, field graphql.CollectedField, obj *models.Todo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Todo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(models.Status)
+	fc.Result = res
+	return ec.marshalNStatus2githubᚗcomᚋnimerfarahtyᚋgoᚑrestᚋmodelsᚐStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _User_id(ctx context.Context, field graphql.CollectedField, obj *models.User) (ret graphql.Marshaler) {
@@ -3033,6 +3090,11 @@ func (ec *executionContext) _Todo(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "completed":
 			out.Values[i] = ec._Todo_completed(ctx, field, obj)
+		case "status":
+			out.Values[i] = ec._Todo_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3379,6 +3441,16 @@ func (ec *executionContext) marshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx c
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNStatus2githubᚗcomᚋnimerfarahtyᚋgoᚑrestᚋmodelsᚐStatus(ctx context.Context, v interface{}) (models.Status, error) {
+	var res models.Status
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNStatus2githubᚗcomᚋnimerfarahtyᚋgoᚑrestᚋmodelsᚐStatus(ctx context.Context, sel ast.SelectionSet, v models.Status) graphql.Marshaler {
+	return v
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {

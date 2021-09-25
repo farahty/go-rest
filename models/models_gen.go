@@ -3,6 +3,9 @@
 package models
 
 import (
+	"fmt"
+	"io"
+	"strconv"
 	"time"
 
 	"github.com/google/uuid"
@@ -45,9 +48,9 @@ type Todo struct {
 	CreatedAt time.Time       `json:"createdAt"`
 	UpdatedAt time.Time       `json:"updatedAt"`
 	DeletedAt *gorm.DeletedAt `json:"deletedAt" gorm:"index"`
-	// #gorm:index
-	Name      string `json:"name"`
-	Completed *bool  `json:"completed"`
+	Name      string          `json:"name" gorm:"index"`
+	Completed *bool           `json:"completed" gorm:"default:false"`
+	Status    Status          `json:"status"`
 }
 
 func (Todo) IsBase() {}
@@ -71,3 +74,52 @@ type User struct {
 }
 
 func (User) IsBase() {}
+
+type Status string
+
+const (
+	StatusActive      Status = "Active"
+	StatusDeactivated Status = "Deactivated"
+	StatusBlocked     Status = "Blocked"
+	StatusDraft       Status = "Draft"
+	StatusPending     Status = "Pending"
+	StatusClosed      Status = "Closed"
+)
+
+var AllStatus = []Status{
+	StatusActive,
+	StatusDeactivated,
+	StatusBlocked,
+	StatusDraft,
+	StatusPending,
+	StatusClosed,
+}
+
+func (e Status) IsValid() bool {
+	switch e {
+	case StatusActive, StatusDeactivated, StatusBlocked, StatusDraft, StatusPending, StatusClosed:
+		return true
+	}
+	return false
+}
+
+func (e Status) String() string {
+	return string(e)
+}
+
+func (e *Status) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = Status(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid Status", str)
+	}
+	return nil
+}
+
+func (e Status) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}

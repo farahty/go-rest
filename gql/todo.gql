@@ -3,14 +3,19 @@ type Todo implements Base {
   createdAt: Time!
   updatedAt: Time!
   deletedAt: DeletedAt
+
   "#gorm:index"
   name: String!
+
+  "#gorm:default:false"
   completed: Boolean
+
+  status: Status!
 }
 
 input CreateTodoInput {
   name: String!
-  completed: Boolean = false
+  completed: Boolean
 }
 
 extend type Mutation {

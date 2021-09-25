@@ -27,9 +27,9 @@ func Update(input models.UpdateUserInput) (*models.User, error) {
 		return nil, err
 	}
 
-	user := &models.User{}
+	user := &models.User{ID: input.ID}
 
-	tx := database.Conn.First(&user, input.ID).Updates(input.ToModel())
+	tx := database.Conn.First(&user).Updates(input.ToModel())
 
 	if tx.Error != nil {
 		return nil, tx.Error

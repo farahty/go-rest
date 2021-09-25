@@ -6,6 +6,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/arsmn/fastgql/api"
 	"github.com/arsmn/fastgql/codegen/config"
@@ -19,7 +20,12 @@ func mutateHook(b *modelgen.ModelBuild) *modelgen.ModelBuild {
 			tag := ""
 
 			//println(field.Type.String())
-			println(field.Name, field.Description)
+
+			if strings.HasPrefix(field.Description, "#gorm:") {
+				tag += strings.TrimPrefix(field.Description, "#gorm:")
+				field.Description = ""
+			}
+
 			if field.Type.String() == "github.com/google/uuid.UUID" {
 				tag += "type:uuid;primaryKey;default:uuid_generate_v4()"
 			}
