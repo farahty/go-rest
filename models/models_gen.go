@@ -13,11 +13,44 @@ type Base interface {
 	IsBase()
 }
 
+type CreatePostInput struct {
+	Title string  `json:"title"`
+	Body  *string `json:"body"`
+}
+
+type CreateTodoInput struct {
+	Name      string `json:"name"`
+	Completed *bool  `json:"completed"`
+}
+
 type CreateUserInput struct {
 	Email    *string `json:"email"`
 	Phone    *string `json:"phone"`
 	Password *string `json:"password"`
 }
+
+type Post struct {
+	ID        uuid.UUID       `json:"id" gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	CreatedAt time.Time       `json:"createdAt"`
+	UpdatedAt time.Time       `json:"updatedAt"`
+	DeletedAt *gorm.DeletedAt `json:"deletedAt" gorm:"index"`
+	Title     string          `json:"title"`
+	Body      *string         `json:"body"`
+}
+
+func (Post) IsBase() {}
+
+type Todo struct {
+	ID        uuid.UUID       `json:"id" gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	CreatedAt time.Time       `json:"createdAt"`
+	UpdatedAt time.Time       `json:"updatedAt"`
+	DeletedAt *gorm.DeletedAt `json:"deletedAt" gorm:"index"`
+	// #gorm:index
+	Name      string `json:"name"`
+	Completed *bool  `json:"completed"`
+}
+
+func (Todo) IsBase() {}
 
 type UpdateUserInput struct {
 	ID       uuid.UUID `json:"id" gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`

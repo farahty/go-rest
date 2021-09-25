@@ -1,0 +1,21 @@
+type Post implements Base {
+  id: ID!
+  createdAt: Time!
+  updatedAt: Time!
+  deletedAt: DeletedAt
+  title: String!
+  body: String
+}
+
+input CreatePostInput {
+  title: String!
+  body: String
+}
+
+extend type Query {
+  posts: [Post]
+}
+
+extend type Mutation {
+  createPost(post: CreatePostInput!): Post
+}

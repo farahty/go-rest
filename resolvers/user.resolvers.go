@@ -5,29 +5,19 @@ package resolvers
 
 import (
 	"context"
+	"fmt"
 
-	"github.com/nimerfarahty/go-rest/generated"
 	"github.com/nimerfarahty/go-rest/models"
-	usersService "github.com/nimerfarahty/go-rest/services/users"
 )
 
 func (r *mutationResolver) CreateUser(ctx context.Context, user models.CreateUserInput) (*models.User, error) {
-	return usersService.CreateUser(&user)
+	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *mutationResolver) UpdateUser(ctx context.Context, user models.UpdateUserInput) (*models.User, error) {
-	return usersService.Update(user)
+	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *queryResolver) Users(ctx context.Context) ([]*models.User, error) {
-	return usersService.FindAll()
+	panic(fmt.Errorf("not implemented"))
 }
-
-// Mutation returns generated.MutationResolver implementation.
-func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
-
-// Query returns generated.QueryResolver implementation.
-func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
-
-type mutationResolver struct{ *Resolver }
-type queryResolver struct{ *Resolver }

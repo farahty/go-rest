@@ -1,13 +1,3 @@
-scalar Time
-scalar DeletedAt
-
-interface Base {
-  id: ID!
-  createdAt: Time!
-  updatedAt: Time!
-  deletedAt: DeletedAt
-}
-
 type User implements Base {
   id: ID!
   createdAt: Time!
@@ -32,11 +22,11 @@ input UpdateUserInput {
   password: String
 }
 
-type Query {
+extend type Query {
   users: [User]
 }
 
-type Mutation {
+extend type Mutation {
   createUser(user: CreateUserInput!): User
   updateUser(user: UpdateUserInput!): User
 }

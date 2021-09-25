@@ -19,6 +19,7 @@ func mutateHook(b *modelgen.ModelBuild) *modelgen.ModelBuild {
 			tag := ""
 
 			//println(field.Type.String())
+			println(field.Name, field.Description)
 			if field.Type.String() == "github.com/google/uuid.UUID" {
 				tag += "type:uuid;primaryKey;default:uuid_generate_v4()"
 			}

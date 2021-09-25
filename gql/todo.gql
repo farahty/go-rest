@@ -1,0 +1,22 @@
+type Todo implements Base {
+  id: ID!
+  createdAt: Time!
+  updatedAt: Time!
+  deletedAt: DeletedAt
+  "#gorm:index"
+  name: String!
+  completed: Boolean
+}
+
+input CreateTodoInput {
+  name: String!
+  completed: Boolean = false
+}
+
+extend type Mutation {
+  createTodo(todo: CreateTodoInput!): Todo
+}
+
+extend type Query {
+  todos: [Todo]
+}

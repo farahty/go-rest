@@ -1,0 +1,9 @@
+scalar Time
+scalar DeletedAt
+
+interface Base {
+  id: ID!
+  createdAt: Time!
+  updatedAt: Time!
+  deletedAt: DeletedAt
+}
