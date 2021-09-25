@@ -9,6 +9,7 @@ func Create(input models.CreateTodoInput) (*models.Todo, error) {
 	todo := &models.Todo{
 		Name:      input.Name,
 		Completed: input.Completed,
+		UserID:    input.UserID,
 	}
 
 	if tx := database.Conn.Create(&todo); tx.Error != nil {
@@ -22,7 +23,7 @@ func Find() ([]*models.Todo, error) {
 
 	todos := []*models.Todo{}
 
-	if tx := database.Conn.Find(&todos); tx.Error != nil {
+	if tx := database.Conn.Preload("User").Find(&todos); tx.Error != nil {
 		return todos, tx.Error
 	}
 

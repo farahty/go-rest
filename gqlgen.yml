@@ -26,8 +26,10 @@ models:
     model: github.com/nimerfarahty/go-rest/scalars.DeletedAt
     
   ID:
-    model:
-      - github.com/nimerfarahty/go-rest/scalars.ID
+    model:            
+      - github.com/arsmn/fastgql/graphql.Int
+      - github.com/arsmn/fastgql/graphql.Int64
+      - github.com/arsmn/fastgql/graphql.Int32
       - github.com/arsmn/fastgql/graphql.ID
   Int:
     model:

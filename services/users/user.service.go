@@ -43,7 +43,7 @@ func FindAll() ([]*models.User, error) {
 
 	users := []*models.User{}
 
-	tx := database.Conn.Find(&users)
+	tx := database.Conn.Preload("Todos").Find(&users)
 
 	if tx.Error != nil {
 		return nil, tx.Error

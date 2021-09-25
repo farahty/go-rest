@@ -8,10 +8,11 @@ import (
 	"fmt"
 
 	"github.com/nimerfarahty/go-rest/models"
+	usersService "github.com/nimerfarahty/go-rest/services/users"
 )
 
 func (r *mutationResolver) CreateUser(ctx context.Context, user models.CreateUserInput) (*models.User, error) {
-	panic(fmt.Errorf("not implemented"))
+	return usersService.CreateUser(&user)
 }
 
 func (r *mutationResolver) UpdateUser(ctx context.Context, user models.UpdateUserInput) (*models.User, error) {
@@ -19,5 +20,5 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, user models.UpdateUse
 }
 
 func (r *queryResolver) Users(ctx context.Context) ([]*models.User, error) {
-	panic(fmt.Errorf("not implemented"))
+	return usersService.FindAll()
 }

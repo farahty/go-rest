@@ -17,34 +17,43 @@ func mutateHook(b *modelgen.ModelBuild) *modelgen.ModelBuild {
 	for _, model := range b.Models {
 		for _, field := range model.Fields {
 
-			tag := ""
+			tags := []string{}
 
-			//println(field.Type.String())
-
-			if strings.HasPrefix(field.Description, "#gorm:") {
-				tag += strings.TrimPrefix(field.Description, "#gorm:")
+			if strings.HasPrefix(field.Description, "#orm:") {
+				tags = append(tags, getORM(field.Description)...)
 				field.Description = ""
 			}
 
-			if field.Type.String() == "github.com/google/uuid.UUID" {
-				tag += "type:uuid;primaryKey;default:uuid_generate_v4()"
+			if field.Name == "deletedAt" {
+				tags = append(tags, "index")
 			}
 
-			if field.Type.String() == "gorm.io/gorm.DeletedAt" {
-				tag += "index"
-			}
-
-			if field.Type.String() == "*gorm.io/gorm.DeletedAt" {
-				tag += "index"
-			}
-
-			if tag != "" {
-				field.Tag += ` gorm:"` + tag + `"`
+			if len(tags) > 0 {
+				field.Tag += ` gorm:"` + strings.Join(tags, ";") + `"`
 			}
 		}
 	}
 
 	return b
+}
+
+func getORM(str string) []string {
+
+	orm := []string{}
+
+	parts := strings.Split(strings.TrimPrefix(str, "#orm:"), ";")
+
+	for _, item := range parts {
+		switch item {
+		case "pk":
+			orm = append(orm, "type:serial;primaryKey")
+		default:
+			orm = append(orm, item)
+		}
+	}
+
+	//return strings.Join(orm, ";")
+	return orm
 }
 
 func main() {

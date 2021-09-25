@@ -1,21 +1,24 @@
 type Todo implements Base {
+  "#orm:pk"
   id: ID!
   createdAt: Time!
   updatedAt: Time!
   deletedAt: DeletedAt
 
-  "#gorm:index"
   name: String!
 
-  "#gorm:default:false"
+  "#orm:default:false"
   completed: Boolean
 
-  status: Status!
+  user: User!
+
+  userID: ID!
 }
 
 input CreateTodoInput {
   name: String!
   completed: Boolean
+  userID: ID!
 }
 
 extend type Mutation {

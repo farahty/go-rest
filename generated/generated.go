@@ -13,7 +13,6 @@ import (
 
 	"github.com/arsmn/fastgql/graphql"
 	"github.com/arsmn/fastgql/graphql/introspection"
-	"github.com/google/uuid"
 	"github.com/nimerfarahty/go-rest/models"
 	"github.com/nimerfarahty/go-rest/scalars"
 	gqlparser "github.com/vektah/gqlparser/v2"
@@ -75,8 +74,9 @@ type ComplexityRoot struct {
 		DeletedAt func(childComplexity int) int
 		ID        func(childComplexity int) int
 		Name      func(childComplexity int) int
-		Status    func(childComplexity int) int
 		UpdatedAt func(childComplexity int) int
+		User      func(childComplexity int) int
+		UserID    func(childComplexity int) int
 	}
 
 	User struct {
@@ -86,6 +86,7 @@ type ComplexityRoot struct {
 		ID        func(childComplexity int) int
 		Password  func(childComplexity int) int
 		Phone     func(childComplexity int) int
+		Todos     func(childComplexity int) int
 		Token     func(childComplexity int) int
 		UpdatedAt func(childComplexity int) int
 	}
@@ -264,19 +265,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Todo.Name(childComplexity), true
 
-	case "Todo.status":
-		if e.complexity.Todo.Status == nil {
-			break
-		}
-
-		return e.complexity.Todo.Status(childComplexity), true
-
 	case "Todo.updatedAt":
 		if e.complexity.Todo.UpdatedAt == nil {
 			break
 		}
 
 		return e.complexity.Todo.UpdatedAt(childComplexity), true
+
+	case "Todo.user":
+		if e.complexity.Todo.User == nil {
+			break
+		}
+
+		return e.complexity.Todo.User(childComplexity), true
+
+	case "Todo.userID":
+		if e.complexity.Todo.UserID == nil {
+			break
+		}
+
+		return e.complexity.Todo.UserID(childComplexity), true
 
 	case "User.createdAt":
 		if e.complexity.User.CreatedAt == nil {
@@ -319,6 +327,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.User.Phone(childComplexity), true
+
+	case "User.todos":
+		if e.complexity.User.Todos == nil {
+			break
+		}
+
+		return e.complexity.User.Todos(childComplexity), true
 
 	case "User.token":
 		if e.complexity.User.Token == nil {
@@ -402,6 +417,7 @@ var sources = []*ast.Source{
 scalar DeletedAt
 
 interface Base {
+  "#orm:pk"
   id: ID!
   createdAt: Time!
   updatedAt: Time!
@@ -418,6 +434,7 @@ enum Status {
 }
 `, BuiltIn: false},
 	{Name: "gql/post.gql", Input: `type Post implements Base {
+  "#orm:pk"
   id: ID!
   createdAt: Time!
   updatedAt: Time!
@@ -440,23 +457,26 @@ extend type Mutation {
 }
 `, BuiltIn: false},
 	{Name: "gql/todo.gql", Input: `type Todo implements Base {
+  "#orm:pk"
   id: ID!
   createdAt: Time!
   updatedAt: Time!
   deletedAt: DeletedAt
 
-  "#gorm:index"
   name: String!
 
-  "#gorm:default:false"
+  "#orm:default:false"
   completed: Boolean
 
-  status: Status!
+  user: User!
+
+  userID: ID!
 }
 
 input CreateTodoInput {
   name: String!
   completed: Boolean
+  userID: ID!
 }
 
 extend type Mutation {
@@ -468,6 +488,7 @@ extend type Query {
 }
 `, BuiltIn: false},
 	{Name: "gql/user.gql", Input: `type User implements Base {
+  "#orm:pk"
   id: ID!
   createdAt: Time!
   updatedAt: Time!
@@ -476,6 +497,8 @@ extend type Query {
   phone: String
   password: String
   token: String
+
+  todos: [Todo]
 }
 
 input CreateUserInput {
@@ -806,9 +829,9 @@ func (ec *executionContext) _Post_id(ctx context.Context, field graphql.Collecte
 		}
 		return graphql.Null
 	}
-	res := resTmp.(uuid.UUID)
+	res := resTmp.(int)
 	fc.Result = res
-	return ec.marshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, field.Selections, res)
+	return ec.marshalNID2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Post_createdAt(ctx context.Context, field graphql.CollectedField, obj *models.Post) (ret graphql.Marshaler) {
@@ -1177,9 +1200,9 @@ func (ec *executionContext) _Todo_id(ctx context.Context, field graphql.Collecte
 		}
 		return graphql.Null
 	}
-	res := resTmp.(uuid.UUID)
+	res := resTmp.(int)
 	fc.Result = res
-	return ec.marshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, field.Selections, res)
+	return ec.marshalNID2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Todo_createdAt(ctx context.Context, field graphql.CollectedField, obj *models.Todo) (ret graphql.Marshaler) {
@@ -1351,7 +1374,7 @@ func (ec *executionContext) _Todo_completed(ctx context.Context, field graphql.C
 	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Todo_status(ctx context.Context, field graphql.CollectedField, obj *models.Todo) (ret graphql.Marshaler) {
+func (ec *executionContext) _Todo_user(ctx context.Context, field graphql.CollectedField, obj *models.Todo) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1369,7 +1392,7 @@ func (ec *executionContext) _Todo_status(ctx context.Context, field graphql.Coll
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Status, nil
+		return obj.User, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1381,9 +1404,44 @@ func (ec *executionContext) _Todo_status(ctx context.Context, field graphql.Coll
 		}
 		return graphql.Null
 	}
-	res := resTmp.(models.Status)
+	res := resTmp.(*models.User)
 	fc.Result = res
-	return ec.marshalNStatus2githubᚗcomᚋnimerfarahtyᚋgoᚑrestᚋmodelsᚐStatus(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚖgithubᚗcomᚋnimerfarahtyᚋgoᚑrestᚋmodelsᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Todo_userID(ctx context.Context, field graphql.CollectedField, obj *models.Todo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Todo",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UserID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNID2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _User_id(ctx context.Context, field graphql.CollectedField, obj *models.User) (ret graphql.Marshaler) {
@@ -1416,9 +1474,9 @@ func (ec *executionContext) _User_id(ctx context.Context, field graphql.Collecte
 		}
 		return graphql.Null
 	}
-	res := resTmp.(uuid.UUID)
+	res := resTmp.(int)
 	fc.Result = res
-	return ec.marshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, field.Selections, res)
+	return ec.marshalNID2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _User_createdAt(ctx context.Context, field graphql.CollectedField, obj *models.User) (ret graphql.Marshaler) {
@@ -1649,6 +1707,38 @@ func (ec *executionContext) _User_token(ctx context.Context, field graphql.Colle
 	res := resTmp.(*string)
 	fc.Result = res
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _User_todos(ctx context.Context, field graphql.CollectedField, obj *models.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Todos, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*models.Todo)
+	fc.Result = res
+	return ec.marshalOTodo2ᚕᚖgithubᚗcomᚋnimerfarahtyᚋgoᚑrestᚋmodelsᚐTodo(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
@@ -2788,6 +2878,14 @@ func (ec *executionContext) unmarshalInputCreateTodoInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
+		case "userID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userID"))
+			it.UserID, err = ec.unmarshalNID2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -2840,7 +2938,7 @@ func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, o
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx, v)
+			it.ID, err = ec.unmarshalNID2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3090,8 +3188,13 @@ func (ec *executionContext) _Todo(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "completed":
 			out.Values[i] = ec._Todo_completed(ctx, field, obj)
-		case "status":
-			out.Values[i] = ec._Todo_status(ctx, field, obj)
+		case "user":
+			out.Values[i] = ec._Todo_user(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "userID":
+			out.Values[i] = ec._Todo_userID(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -3142,6 +3245,8 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._User_password(ctx, field, obj)
 		case "token":
 			out.Values[i] = ec._User_token(ctx, field, obj)
+		case "todos":
+			out.Values[i] = ec._User_todos(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3428,29 +3533,19 @@ func (ec *executionContext) unmarshalNCreateUserInput2githubᚗcomᚋnimerfaraht
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx context.Context, v interface{}) (uuid.UUID, error) {
-	res, err := scalars.UnmarshalID(v)
+func (ec *executionContext) unmarshalNID2int(ctx context.Context, v interface{}) (int, error) {
+	res, err := graphql.UnmarshalInt(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx context.Context, sel ast.SelectionSet, v uuid.UUID) graphql.Marshaler {
-	res := scalars.MarshalID(v)
+func (ec *executionContext) marshalNID2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
+	res := graphql.MarshalInt(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
 		}
 	}
 	return res
-}
-
-func (ec *executionContext) unmarshalNStatus2githubᚗcomᚋnimerfarahtyᚋgoᚑrestᚋmodelsᚐStatus(ctx context.Context, v interface{}) (models.Status, error) {
-	var res models.Status
-	err := res.UnmarshalGQL(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNStatus2githubᚗcomᚋnimerfarahtyᚋgoᚑrestᚋmodelsᚐStatus(ctx context.Context, sel ast.SelectionSet, v models.Status) graphql.Marshaler {
-	return v
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
@@ -3486,6 +3581,16 @@ func (ec *executionContext) marshalNTime2timeᚐTime(ctx context.Context, sel as
 func (ec *executionContext) unmarshalNUpdateUserInput2githubᚗcomᚋnimerfarahtyᚋgoᚑrestᚋmodelsᚐUpdateUserInput(ctx context.Context, v interface{}) (models.UpdateUserInput, error) {
 	res, err := ec.unmarshalInputUpdateUserInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋnimerfarahtyᚋgoᚑrestᚋmodelsᚐUser(ctx context.Context, sel ast.SelectionSet, v *models.User) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._User(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋarsmnᚋfastgqlᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {

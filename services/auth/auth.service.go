@@ -2,6 +2,7 @@ package authService
 
 import (
 	"errors"
+	"strconv"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -51,7 +52,7 @@ func successLogin(user *models.User) (*LoginRespose, error) {
 	}
 
 	accessToken, err := createToken(
-		user.ID.String(),
+		strconv.Itoa(user.ID),
 		conf.AccessToken.Secret,
 		conf.AccessToken.Expiry,
 	)

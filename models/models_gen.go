@@ -8,7 +8,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -24,6 +23,7 @@ type CreatePostInput struct {
 type CreateTodoInput struct {
 	Name      string `json:"name"`
 	Completed *bool  `json:"completed"`
+	UserID    int    `json:"userID"`
 }
 
 type CreateUserInput struct {
@@ -33,7 +33,7 @@ type CreateUserInput struct {
 }
 
 type Post struct {
-	ID        uuid.UUID       `json:"id" gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	ID        int             `json:"id" gorm:"type:serial;primaryKey"`
 	CreatedAt time.Time       `json:"createdAt"`
 	UpdatedAt time.Time       `json:"updatedAt"`
 	DeletedAt *gorm.DeletedAt `json:"deletedAt" gorm:"index"`
@@ -44,26 +44,27 @@ type Post struct {
 func (Post) IsBase() {}
 
 type Todo struct {
-	ID        uuid.UUID       `json:"id" gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	ID        int             `json:"id" gorm:"type:serial;primaryKey"`
 	CreatedAt time.Time       `json:"createdAt"`
 	UpdatedAt time.Time       `json:"updatedAt"`
 	DeletedAt *gorm.DeletedAt `json:"deletedAt" gorm:"index"`
-	Name      string          `json:"name" gorm:"index"`
+	Name      string          `json:"name"`
 	Completed *bool           `json:"completed" gorm:"default:false"`
-	Status    Status          `json:"status"`
+	User      *User           `json:"user"`
+	UserID    int             `json:"userID"`
 }
 
 func (Todo) IsBase() {}
 
 type UpdateUserInput struct {
-	ID       uuid.UUID `json:"id" gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
-	Email    *string   `json:"email"`
-	Phone    *string   `json:"phone"`
-	Password *string   `json:"password"`
+	ID       int     `json:"id"`
+	Email    *string `json:"email"`
+	Phone    *string `json:"phone"`
+	Password *string `json:"password"`
 }
 
 type User struct {
-	ID        uuid.UUID       `json:"id" gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	ID        int             `json:"id" gorm:"type:serial;primaryKey"`
 	CreatedAt time.Time       `json:"createdAt"`
 	UpdatedAt time.Time       `json:"updatedAt"`
 	DeletedAt *gorm.DeletedAt `json:"deletedAt" gorm:"index"`
@@ -71,6 +72,7 @@ type User struct {
 	Phone     *string         `json:"phone"`
 	Password  *string         `json:"password"`
 	Token     *string         `json:"token"`
+	Todos     []*Todo         `json:"todos"`
 }
 
 func (User) IsBase() {}

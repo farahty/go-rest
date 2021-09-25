@@ -2,6 +2,7 @@ scalar Time
 scalar DeletedAt
 
 interface Base {
+  "#orm:pk"
   id: ID!
   createdAt: Time!
   updatedAt: Time!
