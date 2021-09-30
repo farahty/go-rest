@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/nimerfarahty/go-rest/models"
 	authService "github.com/nimerfarahty/go-rest/services/auth"
 )
 
@@ -13,8 +14,8 @@ func Authintication(g fiber.Router) {
 
 func login(c *fiber.Ctx) error {
 
-	var loginRespons *authService.LoginRespose
-	var loginInput authService.LoginInput
+	var loginRespons *models.LoginResponse
+	var loginInput models.LoginInput
 	var err error
 
 	if err = c.BodyParser(&loginInput); err != nil {

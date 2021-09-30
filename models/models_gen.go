@@ -32,6 +32,16 @@ type CreateUserInput struct {
 	Password *string `json:"password"`
 }
 
+type LoginInput struct {
+	Identity string `json:"identity"`
+	Password string `json:"password"`
+}
+
+type LoginResponse struct {
+	User   *User   `json:"user"`
+	Tokens *Tokens `json:"tokens"`
+}
+
 type Post struct {
 	ID        int             `json:"id" gorm:"type:serial;primaryKey"`
 	CreatedAt time.Time       `json:"createdAt"`
@@ -55,6 +65,11 @@ type Todo struct {
 }
 
 func (Todo) IsBase() {}
+
+type Tokens struct {
+	AccessToken  string `json:"accessToken"`
+	RefreshToken string `json:"refreshToken"`
+}
 
 type UpdateUserInput struct {
 	ID       int     `json:"id"`

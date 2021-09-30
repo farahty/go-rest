@@ -1,0 +1,18 @@
+type Tokens {
+  accessToken: String!
+  refreshToken: String!
+}
+
+type LoginResponse {
+  user: User!
+  tokens: Tokens!
+}
+
+input LoginInput {
+  identity: String!
+  password: String!
+}
+
+extend type Mutation {
+  login(input: LoginInput!): LoginResponse!
+}

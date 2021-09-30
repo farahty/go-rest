@@ -8,7 +8,7 @@ import (
 	"fmt"
 
 	"github.com/nimerfarahty/go-rest/models"
-	usersService "github.com/nimerfarahty/go-rest/services/users"
+	usersService "github.com/nimerfarahty/go-rest/services/user"
 )
 
 func (r *mutationResolver) CreateUser(ctx context.Context, user models.CreateUserInput) (*models.User, error) {

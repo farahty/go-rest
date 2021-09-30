@@ -12,7 +12,7 @@ import (
 	"github.com/nimerfarahty/go-rest/models"
 )
 
-func Login(loginInput *LoginInput) (*LoginRespose, error) {
+func Login(loginInput *models.LoginInput) (*models.LoginResponse, error) {
 
 	var user *models.User
 
@@ -37,7 +37,7 @@ func RefresTokens() {
 
 }
 
-func successLogin(user *models.User) (*LoginRespose, error) {
+func successLogin(user *models.User) (*models.LoginResponse, error) {
 	conf := config.Keys.Security
 
 	refreshHandle := uuid.NewString()
@@ -69,7 +69,7 @@ func successLogin(user *models.User) (*LoginRespose, error) {
 		return nil, errors.New("error while updating refresh handle")
 	}
 
-	return &LoginRespose{Tokens: Tokens{AccessToken: *accessToken, RefreshToken: *refreshToken}, User: *user}, nil
+	return &models.LoginResponse{Tokens: &models.Tokens{AccessToken: *accessToken, RefreshToken: *refreshToken}, User: user}, nil
 
 }
 

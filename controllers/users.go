@@ -3,7 +3,7 @@ package controllers
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/nimerfarahty/go-rest/models"
-	usersService "github.com/nimerfarahty/go-rest/services/users"
+	usersService "github.com/nimerfarahty/go-rest/services/user"
 )
 
 func UsersController(g fiber.Router) {
