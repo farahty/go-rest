@@ -36,3 +36,8 @@ models:
       - github.com/arsmn/fastgql/graphql.Int
       - github.com/arsmn/fastgql/graphql.Int64
       - github.com/arsmn/fastgql/graphql.Int32
+
+  Todo:
+    fields:
+      user:
+        resolver: true

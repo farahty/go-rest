@@ -23,7 +23,7 @@ func Find() ([]*models.Todo, error) {
 
 	todos := []*models.Todo{}
 
-	if tx := database.Conn.Preload("User").Find(&todos); tx.Error != nil {
+	if tx := database.Conn.Find(&todos); tx.Error != nil {
 		return todos, tx.Error
 	}
 

@@ -51,3 +51,17 @@ func FindAll() ([]*models.User, error) {
 
 	return users, nil
 }
+
+func FindOne(id int) (*models.User, error) {
+
+	user := &models.User{}
+
+	tx := database.Conn.Find(user, id)
+
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+
+	return user, nil
+
+}
