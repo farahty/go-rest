@@ -10,15 +10,14 @@ type Todo implements Base {
   "#orm:default:false"
   completed: Boolean
 
-  user: User!
-
-  userID: ID!
+  owner: User!
+  ownerID: ID!
 }
 
 input CreateTodoInput {
   name: String!
   completed: Boolean
-  userID: ID!
+  ownerID: ID!
 }
 
 extend type Mutation {

@@ -9,10 +9,14 @@ func Create(input models.CreateTodoInput) (*models.Todo, error) {
 	todo := &models.Todo{
 		Name:      input.Name,
 		Completed: input.Completed,
-		UserID:    input.UserID,
+		OwnerID:   input.OwnerID,
 	}
 
 	if tx := database.Conn.Create(&todo); tx.Error != nil {
+		return nil, tx.Error
+	}
+
+	if tx := database.Conn.Preload("Owner").Find(&todo); tx.Error != nil {
 		return nil, tx.Error
 	}
 

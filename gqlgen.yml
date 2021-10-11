@@ -39,5 +39,5 @@ models:
 
   Todo:
     fields:
-      user:
+      owner:
         resolver: true

@@ -20,8 +20,8 @@ func (r *queryResolver) Todos(ctx context.Context) ([]*models.Todo, error) {
 	return todosService.Find()
 }
 
-func (r *todoResolver) User(ctx context.Context, obj *models.Todo) (*models.User, error) {
-	return usersService.FindOne(obj.UserID)
+func (r *todoResolver) Owner(ctx context.Context, obj *models.Todo) (*models.User, error) {
+	return usersService.FindOne(obj.OwnerID)
 }
 
 // Todo returns generated.TodoResolver implementation.

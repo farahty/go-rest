@@ -84,9 +84,9 @@ type ComplexityRoot struct {
 		DeletedAt func(childComplexity int) int
 		ID        func(childComplexity int) int
 		Name      func(childComplexity int) int
+		Owner     func(childComplexity int) int
+		OwnerID   func(childComplexity int) int
 		UpdatedAt func(childComplexity int) int
-		User      func(childComplexity int) int
-		UserID    func(childComplexity int) int
 	}
 
 	Tokens struct {
@@ -121,7 +121,7 @@ type QueryResolver interface {
 	Users(ctx context.Context) ([]*models.User, error)
 }
 type TodoResolver interface {
-	User(ctx context.Context, obj *models.Todo) (*models.User, error)
+	Owner(ctx context.Context, obj *models.Todo) (*models.User, error)
 }
 
 type executableSchema struct {
@@ -325,26 +325,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Todo.Name(childComplexity), true
 
+	case "Todo.owner":
+		if e.complexity.Todo.Owner == nil {
+			break
+		}
+
+		return e.complexity.Todo.Owner(childComplexity), true
+
+	case "Todo.ownerID":
+		if e.complexity.Todo.OwnerID == nil {
+			break
+		}
+
+		return e.complexity.Todo.OwnerID(childComplexity), true
+
 	case "Todo.updatedAt":
 		if e.complexity.Todo.UpdatedAt == nil {
 			break
 		}
 
 		return e.complexity.Todo.UpdatedAt(childComplexity), true
-
-	case "Todo.user":
-		if e.complexity.Todo.User == nil {
-			break
-		}
-
-		return e.complexity.Todo.User(childComplexity), true
-
-	case "Todo.userID":
-		if e.complexity.Todo.UserID == nil {
-			break
-		}
-
-		return e.complexity.Todo.UserID(childComplexity), true
 
 	case "Tokens.accessToken":
 		if e.complexity.Tokens.AccessToken == nil {
@@ -572,15 +572,14 @@ extend type Mutation {
   "#orm:default:false"
   completed: Boolean
 
-  user: User!
-
-  userID: ID!
+  owner: User!
+  ownerID: ID!
 }
 
 input CreateTodoInput {
   name: String!
   completed: Boolean
-  userID: ID!
+  ownerID: ID!
 }
 
 extend type Mutation {
@@ -602,6 +601,7 @@ extend type Query {
   password: String
   token: String
 
+  "#orm:foreignKey:OwnerID"
   todos: [Todo]
 
   "#orm:foreignKey:AuthorID"
@@ -1678,7 +1678,7 @@ func (ec *executionContext) _Todo_completed(ctx context.Context, field graphql.C
 	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Todo_user(ctx context.Context, field graphql.CollectedField, obj *models.Todo) (ret graphql.Marshaler) {
+func (ec *executionContext) _Todo_owner(ctx context.Context, field graphql.CollectedField, obj *models.Todo) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1696,7 +1696,7 @@ func (ec *executionContext) _Todo_user(ctx context.Context, field graphql.Collec
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Todo().User(rctx, obj)
+		return ec.resolvers.Todo().Owner(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1713,7 +1713,7 @@ func (ec *executionContext) _Todo_user(ctx context.Context, field graphql.Collec
 	return ec.marshalNUser2ᚖgithubᚗcomᚋnimerfarahtyᚋgoᚑrestᚋmodelsᚐUser(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Todo_userID(ctx context.Context, field graphql.CollectedField, obj *models.Todo) (ret graphql.Marshaler) {
+func (ec *executionContext) _Todo_ownerID(ctx context.Context, field graphql.CollectedField, obj *models.Todo) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1731,7 +1731,7 @@ func (ec *executionContext) _Todo_userID(ctx context.Context, field graphql.Coll
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.UserID, nil
+		return obj.OwnerID, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3292,11 +3292,11 @@ func (ec *executionContext) unmarshalInputCreateTodoInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
-		case "userID":
+		case "ownerID":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userID"))
-			it.UserID, err = ec.unmarshalNID2int(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownerID"))
+			it.OwnerID, err = ec.unmarshalNID2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3677,7 +3677,7 @@ func (ec *executionContext) _Todo(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "completed":
 			out.Values[i] = ec._Todo_completed(ctx, field, obj)
-		case "user":
+		case "owner":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
 				defer func() {
@@ -3685,14 +3685,14 @@ func (ec *executionContext) _Todo(ctx context.Context, sel ast.SelectionSet, obj
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Todo_user(ctx, field, obj)
+				res = ec._Todo_owner(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
 				return res
 			})
-		case "userID":
-			out.Values[i] = ec._Todo_userID(ctx, field, obj)
+		case "ownerID":
+			out.Values[i] = ec._Todo_ownerID(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}

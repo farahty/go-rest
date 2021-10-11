@@ -24,7 +24,7 @@ type CreatePostInput struct {
 type CreateTodoInput struct {
 	Name      string `json:"name"`
 	Completed *bool  `json:"completed"`
-	UserID    int    `json:"userID"`
+	OwnerID   int    `json:"ownerID"`
 }
 
 type CreateUserInput struct {
@@ -63,8 +63,8 @@ type Todo struct {
 	DeletedAt *gorm.DeletedAt `json:"deletedAt" gorm:"index"`
 	Name      string          `json:"name"`
 	Completed *bool           `json:"completed" gorm:"default:false"`
-	User      *User           `json:"user"`
-	UserID    int             `json:"userID"`
+	Owner     *User           `json:"owner"`
+	OwnerID   int             `json:"ownerID"`
 }
 
 func (Todo) IsBase() {}
@@ -90,7 +90,7 @@ type User struct {
 	Phone     *string         `json:"phone"`
 	Password  *string         `json:"password"`
 	Token     *string         `json:"token"`
-	Todos     []*Todo         `json:"todos"`
+	Todos     []*Todo         `json:"todos" gorm:"foreignKey:OwnerID"`
 	Posts     []*Post         `json:"posts" gorm:"foreignKey:AuthorID"`
 }
 

@@ -9,6 +9,7 @@ type User implements Base {
   password: String
   token: String
 
+  "#orm:foreignKey:OwnerID"
   todos: [Todo]
 
   "#orm:foreignKey:AuthorID"
