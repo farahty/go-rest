@@ -5,18 +5,18 @@ package resolvers
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/nimerfarahty/go-rest/generated"
 	"github.com/nimerfarahty/go-rest/models"
+	postsService "github.com/nimerfarahty/go-rest/services/posts"
 )
 
 func (r *mutationResolver) CreatePost(ctx context.Context, post models.CreatePostInput) (*models.Post, error) {
-	panic(fmt.Errorf("not implemented"))
+	return postsService.CreatePost(post)
 }
 
 func (r *queryResolver) Posts(ctx context.Context) ([]*models.Post, error) {
-	panic(fmt.Errorf("not implemented"))
+	return postsService.FindAll()
 }
 
 // Query returns generated.QueryResolver implementation.

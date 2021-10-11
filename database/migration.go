@@ -6,5 +6,6 @@ func Migrate() error {
 	return Conn.AutoMigrate(
 		&models.User{},
 		&models.Todo{},
+		&models.Post{},
 	)
 }

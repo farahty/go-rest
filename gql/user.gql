@@ -10,6 +10,9 @@ type User implements Base {
   token: String
 
   todos: [Todo]
+
+  "#orm:foreignKey:AuthorID"
+  posts: [Post]
 }
 
 input CreateUserInput {

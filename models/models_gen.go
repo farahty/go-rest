@@ -16,8 +16,9 @@ type Base interface {
 }
 
 type CreatePostInput struct {
-	Title string  `json:"title"`
-	Body  *string `json:"body"`
+	Title    string  `json:"title"`
+	AuthorID *int    `json:"authorId"`
+	Body     *string `json:"body"`
 }
 
 type CreateTodoInput struct {
@@ -49,6 +50,8 @@ type Post struct {
 	DeletedAt *gorm.DeletedAt `json:"deletedAt" gorm:"index"`
 	Title     string          `json:"title"`
 	Body      *string         `json:"body"`
+	Author    *User           `json:"author"`
+	AuthorID  int             `json:"authorId"`
 }
 
 func (Post) IsBase() {}
@@ -88,6 +91,7 @@ type User struct {
 	Password  *string         `json:"password"`
 	Token     *string         `json:"token"`
 	Todos     []*Todo         `json:"todos"`
+	Posts     []*Post         `json:"posts" gorm:"foreignKey:AuthorID"`
 }
 
 func (User) IsBase() {}
