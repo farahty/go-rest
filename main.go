@@ -2,9 +2,9 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/nimerfarahty/go-rest/config"
-	"github.com/nimerfarahty/go-rest/database"
 	_ "github.com/nimerfarahty/go-rest/docs"
 )
 
@@ -14,14 +14,18 @@ func main() {
 		panic(err)
 	}
 
-	if err := database.Connect(); err != nil {
-		panic(err)
-	}
+	args := os.Args[1:]
 
-	if err := database.Migrate(); err != nil {
-		panic(err)
-	}
+	switch {
 
-	log.Fatal(runApp())
+	case len(args) == 0:
+		log.Fatal(runApp())
+	case args[0] == "generate":
+		Generate()
+	case args[0] == "run":
+		log.Fatal(runApp())
+	default:
+		log.Fatal("command not found")
+	}
 
 }

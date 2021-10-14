@@ -10,9 +10,18 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"github.com/nimerfarahty/go-rest/config"
 	"github.com/nimerfarahty/go-rest/controllers"
+	"github.com/nimerfarahty/go-rest/database"
 )
 
 func runApp() error {
+
+	if err := database.Connect(); err != nil {
+		panic(err)
+	}
+
+	if err := database.Migrate(); err != nil {
+		panic(err)
+	}
 
 	app := fiber.New()
 	addr := fmt.Sprintf(":%s", config.Keys.Server.Port)
