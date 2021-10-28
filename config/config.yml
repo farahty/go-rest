@@ -2,7 +2,7 @@ database:
   host: dev.fastme.net
   port: 5432
   user: nimer_farahty
-  password: Nimer@20210810
+  password: ******
   database: go_lang
 
 server:
