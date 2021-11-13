@@ -1,0 +1,17 @@
+database:
+  host: dev.fastme.net
+  port: 5432
+  user: nimer_farahty
+  password: Nimer@20210810
+  database: go_lang
+
+server:
+  port: 3000
+
+security:  
+  refreshToken:
+    expiry: 5h
+    secret: jlwjdlwjldjwlkdjlwdrgergfewgf
+  accessToken:
+    expiry: 5m
+    secret: lhlkhdlwhdhwlkdnwlkndw

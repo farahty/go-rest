@@ -49,7 +49,6 @@ func getORM(str string) []string {
 		}
 	}
 
-	//return strings.Join(orm, ";")
 	return orm
 }
 

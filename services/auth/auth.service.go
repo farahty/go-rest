@@ -21,7 +21,7 @@ func Login(loginInput *models.LoginInput) (*models.LoginResponse, error) {
 	if tx.RowsAffected != 1 {
 		return nil, errors.New("no user found")
 	}
-	println(*user.Password, loginInput.Password)
+
 	if !user.CheckPassword(loginInput.Password) {
 		return nil, errors.New("incorrect password")
 	}
@@ -39,12 +39,21 @@ func RefresTokens() {
 
 func successLogin(user *models.User) (*models.LoginResponse, error) {
 	conf := config.Keys.Security
+	identity := user.Email
+	if identity == nil {
+		identity = user.Phone
+	}
 
 	refreshHandle := uuid.NewString()
 	refreshToken, err := createToken(
 		refreshHandle,
 		conf.RefreshToken.Secret,
 		conf.RefreshToken.Expiry,
+		models.UserJWT{
+			ID:       strconv.Itoa(user.ID),
+			Role:     user.Role,
+			Identity: *identity,
+		},
 	)
 
 	if err != nil {
@@ -55,6 +64,11 @@ func successLogin(user *models.User) (*models.LoginResponse, error) {
 		strconv.Itoa(user.ID),
 		conf.AccessToken.Secret,
 		conf.AccessToken.Expiry,
+		models.UserJWT{
+			ID:       strconv.Itoa(user.ID),
+			Role:     user.Role,
+			Identity: *identity,
+		},
 	)
 
 	if err != nil {
@@ -73,7 +87,7 @@ func successLogin(user *models.User) (*models.LoginResponse, error) {
 
 }
 
-func createToken(sub string, secret string, expiry string) (*string, error) {
+func createToken(sub string, secret string, expiry string, payload interface{}) (*string, error) {
 
 	duration, err := time.ParseDuration(expiry)
 
@@ -85,6 +99,7 @@ func createToken(sub string, secret string, expiry string) (*string, error) {
 	claims := token.Claims.(jwt.MapClaims)
 	claims["sub"] = sub
 	claims["exp"] = time.Now().Add(duration).Unix()
+	claims["data"] = payload
 
 	signedToken, err := token.SignedString([]byte(secret))
 	if err != nil {

@@ -25,5 +25,5 @@ extend type Mutation {
 }
 
 extend type Query {
-  todos: [Todo]
+  todos: [Todo] @hasRole(role: ADMIN)
 }

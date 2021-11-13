@@ -28,3 +28,9 @@ func (u *User) CheckPassword(password string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(*u.Password), []byte(password))
 	return err == nil
 }
+
+type UserJWT struct {
+	ID       string `json:"id"`
+	Identity string `json:"identity"`
+	Role     Role   `json:"role"`
+}
